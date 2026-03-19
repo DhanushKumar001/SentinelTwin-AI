@@ -1,0 +1,55 @@
+version: "3.9"
+
+# SentinelTwin AI — Python 3.10
+# Folders renamed to avoid Docker overlap:
+#   sentinelcore/  (was: backend/)
+#   sentinelui/    (was: frontend/)
+#
+# Dashboard 1  →  http://localhost:3000/
+# Dashboard 2  →  http://localhost:3000/dashboard2.html
+# API docs     →  http://localhost:8000/api/docs
+# Health       →  http://localhost:8000/health
+
+services:
+
+  sentineltwin-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentineltwin_api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=production
+      - HOST=0.0.0.0
+      - PORT=8000
+      - SIMULATION_TICK_INTERVAL=2.0
+      - WEBSOCKET_HEARTBEAT_INTERVAL=30
+      - LOG_LEVEL=info
+      - PYTHONPATH=/app
+    volumes:
+      - ./sentinelcore:/app/sentinelcore
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  sentineltwin-ui:
+    image: nginx:alpine
+    container_name: sentineltwin_ui
+    ports:
+      - "3000:80"
+    volumes:
+      - ./sentinelui:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      sentineltwin-api:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  default:
+    name: sentineltwin_network

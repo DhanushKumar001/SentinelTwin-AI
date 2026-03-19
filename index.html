@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SentinelTwin AI — Instant Access</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0A1628;color:white;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:36px;width:100%;max-width:520px;text-align:center}
+.logo{font-size:40px;margin-bottom:12px}
+h1{font-size:26px;font-weight:700;margin-bottom:6px;letter-spacing:-0.5px}
+.sub{color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:28px}
+.status-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px;font-size:13px}
+.dot{width:10px;height:10px;border-radius:50%;background:#4CAF50;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn-open{display:block;width:100%;padding:14px;background:#1565C0;color:white;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;transition:background 0.15s;margin-bottom:12px}
+.btn-open:hover{background:#1976D2}
+.btn-docs{display:block;width:100%;padding:10px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:10px;font-size:14px;cursor:pointer;text-decoration:none;transition:all 0.15s}
+.btn-docs:hover{background:rgba(255,255,255,0.1)}
+.modules{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:24px;text-align:left}
+.module{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 12px;font-size:12px}
+.module-icon{font-size:14px;margin-right:5px}
+.module-name{font-weight:600;color:rgba(255,255,255,0.85)}
+.module-desc{color:rgba(255,255,255,0.4);font-size:11px;margin-top:1px}
+.setup-box{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;margin-top:24px;text-align:left}
+.setup-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.4);margin-bottom:8px}
+code{background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:13px;color:#80CEFF}
+pre{background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;font-size:12px;font-family:monospace;color:#B0D4FF;overflow-x:auto;line-height:1.7;margin-top:8px}
+.link-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.link-btn{flex:1;padding:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.7);font-size:12px;text-align:center;text-decoration:none;cursor:pointer}
+.link-btn:hover{background:rgba(255,255,255,0.1)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">⚡</div>
+  <h1>SentinelTwin AI</h1>
+  <div class="sub">Industry 4.0 Autonomous Smart Factory Intelligence Platform</div>
+
+  <div class="status-row">
+    <div class="dot" id="status-dot" style="background:#607D8B"></div>
+    <span id="status-text">Checking backend connection…</span>
+  </div>
+
+  <a class="btn-open" href="http://localhost:3000" target="_blank" id="btn-dashboard">
+    🚀 Open Dashboard (Frontend)
+  </a>
+  <a class="btn-docs" href="http://localhost:8000/api/docs" target="_blank">
+    📖 API Documentation (Swagger)
+  </a>
+
+  <div class="link-row">
+    <a class="link-btn" href="http://localhost:8000/health" target="_blank">🏥 Health Check</a>
+    <a class="link-btn" href="http://localhost:8000/api/factory/state" target="_blank">📊 Factory State</a>
+    <a class="link-btn" href="http://localhost:8000/api/system/info" target="_blank">ℹ System Info</a>
+    <a class="link-btn" href="http://localhost:8000/api/incidents" target="_blank">🕐 Incidents</a>
+  </div>
+
+  <div class="modules">
+    <div class="module"><span class="module-icon">🔮</span><span class="module-name">Predictive Maint. AI</span><div class="module-desc">TCN · LSTM · TFT Ensemble</div></div>
+    <div class="module"><span class="module-icon">📡</span><span class="module-name">Anomaly Detection</span><div class="module-desc">Autoencoder · IsoForest · LSTM</div></div>
+    <div class="module"><span class="module-icon">🔍</span><span class="module-name">Defect Detection</span><div class="module-desc">YOLOv8 · Swin · Mask R-CNN</div></div>
+    <div class="module"><span class="module-icon">🛡️</span><span class="module-name">Cybersecurity IDS</span><div class="module-desc">Network · PLC · Auto Response</div></div>
+    <div class="module"><span class="module-icon">🧬</span><span class="module-name">Root Cause Analysis</span><div class="module-desc">Causal chain tracing</div></div>
+    <div class="module"><span class="module-icon">♻️</span><span class="module-name">Self-Healing Control</span><div class="module-desc">PPO · SAC · DQN</div></div>
+    <div class="module"><span class="module-icon">📈</span><span class="module-name">Production Optimizer</span><div class="module-desc">RL · GNN · Bayesian</div></div>
+    <div class="module"><span class="module-icon">🌐</span><span class="module-name">3D Digital Twin</span><div class="module-desc">Three.js · Real-time physics</div></div>
+  </div>
+
+  <div class="setup-box">
+    <div class="setup-title">🐳 Quick Start — Docker</div>
+    <pre>cd sentineltwin
+docker-compose up --build</pre>
+    <div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,0.4)">
+      Then open: <code>http://localhost:3000</code> for the dashboard<br/>
+      Backend runs at: <code>http://localhost:8000</code>
+    </div>
+    <div style="margin-top:10px" class="setup-title">⚡ Dev Mode (no Docker)</div>
+    <pre>cd sentineltwin/backend
+pip install -r requirements.txt
+uvicorn backend.main:app --reload --port 8000</pre>
+    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:6px">
+      Then open <code>frontend/index.html</code> directly in browser — no server needed for frontend.
+    </div>
+  </div>
+</div>
+
+<script>
+async function checkBackend() {
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  try {
+    const res = await fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(3000) });
+    const data = await res.json();
+    if (data.status === 'healthy') {
+      dot.style.background = '#4CAF50';
+      text.textContent = `Backend online · ${data.websocket_connections || 0} clients connected`;
+    } else {
+      throw new Error('not healthy');
+    }
+  } catch (e) {
+    dot.style.background = '#F44336';
+    text.textContent = 'Backend not running — start with docker-compose up';
+  }
+}
+checkBackend();
+setInterval(checkBackend, 5000);
+</script>
+</body>
+</html>

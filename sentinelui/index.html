@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SentinelTwin AI — Smart Factory Intelligence Platform</title>
+<link rel="stylesheet" href="css/styles.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      SentinelTwin AI
+      <span style="font-size:11px;font-weight:400;opacity:0.5;margin-left:4px">v1.0 Industry 4.0</span>
+    </div>
+    <div class="top-bar-right">
+      <a href="/dashboard2.html" target="_blank"
+         style="font-size:11px;color:#00d4ff;text-decoration:none;padding:4px 12px;
+                border:1px solid #1a3044;border-radius:4px;font-family:monospace;
+                letter-spacing:1px;background:#060d12;transition:all 0.2s;white-space:nowrap;"
+         onmouseover="this.style.borderColor='#00b4d8';this.style.background='#003c56'"
+         onmouseout="this.style.borderColor='#1a3044';this.style.background='#060d12'">
+        ⚡ AI CONTROL DASHBOARD →
+      </a>
+      <span id="factory-status-badge" class="status-badge">RUNNING</span>
+      <div class="conn-indicator">
+        <div id="conn-dot" class="conn-dot disconnected"></div>
+        <span id="conn-label">Connecting…</span>
+      </div>
+      <span class="time-display" id="clock">00:00:00</span>
+    </div>
+  </header>
+
+  <div class="main-content">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="sidebar-section-label">Monitoring</div>
+      <div class="nav-item active" data-view="overview">
+        <span class="nav-icon">🏭</span> Overview
+      </div>
+      <div class="nav-item" data-view="twin">
+        <span class="nav-icon">🌐</span> 3D Digital Twin
+      </div>
+      <div class="nav-item" data-view="machines">
+        <span class="nav-icon">⚙️</span> Machines
+      </div>
+      <div class="nav-item" data-view="alerts">
+        <span class="nav-icon">🔔</span> Alerts
+      </div>
+
+      <div class="sidebar-section-label">AI Intelligence</div>
+      <div class="nav-item" data-view="predictive">
+        <span class="nav-icon">🔮</span> Predictive AI
+      </div>
+      <div class="nav-item" data-view="anomaly">
+        <span class="nav-icon">📡</span> Anomaly Detection
+      </div>
+      <div class="nav-item" data-view="defect">
+        <span class="nav-icon">🔍</span> Defect Detection
+      </div>
+      <div class="nav-item" data-view="rca">
+        <span class="nav-icon">🧬</span> Root Cause AI
+      </div>
+      <div class="nav-item" data-view="healing">
+        <span class="nav-icon">♻️</span> Self-Healing
+      </div>
+
+      <div class="sidebar-section-label">Operations</div>
+      <div class="nav-item" data-view="production">
+        <span class="nav-icon">📈</span> Production
+      </div>
+      <div class="nav-item" data-view="cyber">
+        <span class="nav-icon">🛡️</span> Cybersecurity
+      </div>
+      <div class="nav-item" data-view="lifecycle">
+        <span class="nav-icon">📋</span> Lifecycle
+      </div>
+      <div class="nav-item" data-view="timeline">
+        <span class="nav-icon">🕐</span> Incident Timeline
+      </div>
+      <div class="nav-item" data-view="scenarios">
+        <span class="nav-icon">🎭</span> Scenarios
+      </div>
+
+      <div class="sidebar-efficiency">
+        <div class="eff-label">Factory Efficiency</div>
+        <div class="eff-value" id="sidebar-eff">—</div>
+        <div class="eff-sub">Overall performance</div>
+      </div>
+    </nav>
+
+    <!-- CONTENT AREA -->
+    <main class="content-area">
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: OVERVIEW                                                 -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-overview" class="view active" style="display:contents">
+
+        <!-- KPI Row -->
+        <div class="panel-grid panel-grid-4">
+          <div class="kpi-card">
+            <div class="kpi-label">Factory Efficiency</div>
+            <div class="kpi-value text-success" id="kpi-efficiency">—</div>
+            <div class="kpi-delta neutral" id="failure-risk-label">Risk: Low</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Production Throughput</div>
+            <div class="kpi-value" id="kpi-throughput">—</div>
+            <div class="kpi-delta neutral">% of capacity</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Total Units Produced</div>
+            <div class="kpi-value" id="kpi-production">0</div>
+            <div class="kpi-delta up" id="bottleneck-row" style="display:none">⚠ Bottleneck: <span id="kpi-bottleneck"></span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Avg Machine Health</div>
+            <div class="kpi-value" id="kpi-health">—</div>
+            <div class="kpi-delta neutral" id="kpi-utilization">Utilization: —</div>
+          </div>
+        </div>
+
+        <!-- Machine Cards -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">⚙️</span> Machine Monitoring — All 5 Machines</div>
+          </div>
+          <div class="panel-body">
+            <div class="panel-grid" style="grid-template-columns:repeat(5,1fr);gap:10px">
+              <!-- M1 -->
+              <div class="machine-card status-normal" id="machine-card-M1" onclick="document.querySelector('[data-view=machines]').click()">
+                <div class="machine-card-header">
+                  <span class="machine-id-tag">M1</span>
+                  <span class="need-action-tag" style="display:none">Action!</span>
+                </div>
+                <div class="machine-name">Raw Material Processor</div>
+                <div class="sensor-mini-grid">
+                  <div class="sensor-mini"><div class="sensor-mini-label">Temp</div><div class="sensor-mini-val ok sensor-temp">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Vib</div><div class="sensor-mini-val ok sensor-vib">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Curr</div><div class="sensor-mini-val ok sensor-curr">—</div></div>
+                </div>
+                <div class="machine-health-bar"><div class="machine-health-fill" style="width:95%"></div></div>
+              </div>
+              <!-- M2 -->
+              <div class="machine-card status-normal" id="machine-card-M2" onclick="document.querySelector('[data-view=machines]').click()">
+                <div class="machine-card-header">
+                  <span class="machine-id-tag">M2</span>
+                  <span class="need-action-tag" style="display:none">Action!</span>
+                </div>
+                <div class="machine-name">Assembly Robot</div>
+                <div class="sensor-mini-grid">
+                  <div class="sensor-mini"><div class="sensor-mini-label">Temp</div><div class="sensor-mini-val ok sensor-temp">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Vib</div><div class="sensor-mini-val ok sensor-vib">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Curr</div><div class="sensor-mini-val ok sensor-curr">—</div></div>
+                </div>
+                <div class="machine-health-bar"><div class="machine-health-fill" style="width:85%"></div></div>
+              </div>
+              <!-- M3 -->
+              <div class="machine-card status-normal" id="machine-card-M3" onclick="document.querySelector('[data-view=machines]').click()">
+                <div class="machine-card-header">
+                  <span class="machine-id-tag">M3</span>
+                  <span class="need-action-tag" style="display:none">Action!</span>
+                </div>
+                <div class="machine-name">Quality Inspection</div>
+                <div class="sensor-mini-grid">
+                  <div class="sensor-mini"><div class="sensor-mini-label">Temp</div><div class="sensor-mini-val ok sensor-temp">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Vib</div><div class="sensor-mini-val ok sensor-vib">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Curr</div><div class="sensor-mini-val ok sensor-curr">—</div></div>
+                </div>
+                <div class="machine-health-bar"><div class="machine-health-fill" style="width:92%"></div></div>
+              </div>
+              <!-- M4 -->
+              <div class="machine-card status-normal" id="machine-card-M4" onclick="document.querySelector('[data-view=machines]').click()">
+                <div class="machine-card-header">
+                  <span class="machine-id-tag">M4</span>
+                  <span class="need-action-tag" style="display:none">Action!</span>
+                </div>
+                <div class="machine-name">Packaging Machine</div>
+                <div class="sensor-mini-grid">
+                  <div class="sensor-mini"><div class="sensor-mini-label">Temp</div><div class="sensor-mini-val ok sensor-temp">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Vib</div><div class="sensor-mini-val ok sensor-vib">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Curr</div><div class="sensor-mini-val ok sensor-curr">—</div></div>
+                </div>
+                <div class="machine-health-bar"><div class="machine-health-fill" style="width:78%"></div></div>
+              </div>
+              <!-- M5 -->
+              <div class="machine-card status-normal" id="machine-card-M5" onclick="document.querySelector('[data-view=machines]').click()">
+                <div class="machine-card-header">
+                  <span class="machine-id-tag">M5</span>
+                  <span class="need-action-tag" style="display:none">Action!</span>
+                </div>
+                <div class="machine-name">Distribution Robot</div>
+                <div class="sensor-mini-grid">
+                  <div class="sensor-mini"><div class="sensor-mini-label">Temp</div><div class="sensor-mini-val ok sensor-temp">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Vib</div><div class="sensor-mini-val ok sensor-vib">—</div></div>
+                  <div class="sensor-mini"><div class="sensor-mini-label">Curr</div><div class="sensor-mini-val ok sensor-curr">—</div></div>
+                </div>
+                <div class="machine-health-bar"><div class="machine-health-fill" style="width:88%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">📊</span> Production Throughput</div>
+              <span class="panel-badge info">Live</span>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container" style="height:160px">
+                <canvas id="chart-production"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">💚</span> Machine Health Trends</div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container" style="height:160px">
+                <canvas id="chart-machine-health"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row: Alerts + Timeline -->
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🔔</span> Smart Alert Feed</div>
+              <span class="panel-badge warning" id="alert-count-badge">0</span>
+            </div>
+            <div class="panel-body" style="padding:8px">
+              <div class="alert-list" id="alert-list">
+                <div class="text-muted" style="padding:8px;font-size:12px">Waiting for alerts…</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🕐</span> Incident Timeline</div>
+            </div>
+            <div class="panel-body" style="padding:8px">
+              <div class="timeline" id="timeline-list">
+                <div class="text-muted" style="padding:8px;font-size:12px">No events yet…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-overview -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: 3D DIGITAL TWIN                                          -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-twin" class="view" style="display:none;flex-direction:column;gap:10px;height:100%">
+        <div class="twin-header">
+          <div style="font-weight:700;font-size:15px">3D Digital Twin — SentinelTwin Smart Factory</div>
+          <div class="twin-controls">
+            <button class="btn btn-outline" id="btn-heatmap">🌡 Heatmap</button>
+            <button class="btn btn-outline" id="btn-pipelines">🔵 Pipelines</button>
+            <button class="btn btn-outline" id="btn-reset-cam">🎥 Reset Camera</button>
+            <span style="font-size:11px;color:var(--text-muted)">Left drag: rotate · Right drag: pan · Scroll: zoom · Click machine: details</span>
+          </div>
+        </div>
+        <div id="twin-canvas-container" style="flex:1;min-height:480px;position:relative">
+          <div class="twin-overlay-info">
+            SentinelTwin 3D Factory · 5 Machines · Real-time Physics
+          </div>
+          <div class="twin-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#4CAF50"></div>Normal</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FF9800"></div>Warning</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#F44336"></div>Critical</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#9C27B0"></div>Failure</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#2196F3"></div>Pipeline</div>
+          </div>
+          <div class="machine-info-overlay" id="machine-info-overlay"></div>
+        </div>
+      </div><!-- /view-twin -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: MACHINES                                                 -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-machines" class="view" style="display:none">
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">📉</span> Machine Utilization</div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container" style="height:180px">
+                <canvas id="chart-utilization"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🎯</span> Factory KPI Radar</div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container" style="height:180px">
+                <canvas id="chart-radar"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🌡</span> Temperature Sensor — M1</div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container" style="height:140px">
+                <canvas id="chart-temp-m1"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">〰</span> Vibration Sensor — M1</div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container" style="height:140px">
+                <canvas id="chart-vib-m1"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">⚙️</span> Factory Efficiency Score Breakdown</div>
+          </div>
+          <div class="panel-body">
+            <div class="panel-grid panel-grid-4">
+              <div class="kpi-card"><div class="kpi-label">Score</div><div class="kpi-value text-success" id="eff-score-main">—</div></div>
+              <div class="kpi-card"><div class="kpi-label">Utilization</div><div class="kpi-value" id="eff-utilization">—</div></div>
+              <div class="kpi-card"><div class="kpi-label">Throughput</div><div class="kpi-value" id="eff-throughput">—</div></div>
+              <div class="kpi-card"><div class="kpi-label">Energy Eff.</div><div class="kpi-value" id="eff-energy">—</div></div>
+            </div>
+            <div class="panel-grid panel-grid-2" style="margin-top:10px">
+              <div class="kpi-card"><div class="kpi-label">Downtime Score</div><div class="kpi-value" id="eff-downtime">—</div></div>
+              <div class="kpi-card"><div class="kpi-label">Failure Risk</div><div class="kpi-value" id="eff-risk">Low</div></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-machines -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: ALERTS                                                   -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-alerts" class="view" style="display:none">
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🔔</span> Smart Alert Prioritization</div>
+              <span class="panel-badge warning" id="alert-count-badge-2">0</span>
+            </div>
+            <div class="panel-body" style="padding:8px">
+              <div class="alert-list" id="alert-list-full" style="max-height:500px">
+                <div class="text-muted" style="padding:8px;font-size:12px">No active alerts</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🕐</span> Full Incident Timeline</div>
+            </div>
+            <div class="panel-body" style="padding:8px">
+              <div class="timeline" id="timeline-list-full" style="max-height:500px">
+                <div class="text-muted" style="padding:8px;font-size:12px">Loading events…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-alerts -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: PREDICTIVE MAINTENANCE                                   -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-predictive" class="view" style="display:none">
+        <div class="panel-grid panel-grid-2">
+          <div class="panel" style="grid-column:1/-1">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🔮</span> Predictive Maintenance AI — TCN + LSTM + TFT Ensemble</div>
+            </div>
+            <div id="prediction-list" style="display:grid;grid-template-columns:repeat(5,1fr);gap:0">
+              <div class="panel-body text-muted" style="font-size:12px;grid-column:1/-1">Loading predictions…</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-predictive -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: ANOMALY DETECTION                                        -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-anomaly" class="view" style="display:none">
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">📡</span> Anomaly Detection AI — 3-Detector Voting</div>
+              <span class="panel-badge info">Autoencoder · IsoForest · LSTM</span>
+            </div>
+            <div class="panel-body" style="padding:8px">
+              <div id="anomaly-list" style="max-height:500px;overflow-y:auto">
+                <div class="text-muted" style="padding:12px;font-size:12px">Monitoring sensor streams…</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">💡</span> Anomaly Explanation</div>
+            </div>
+            <div class="panel-body">
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.7">
+                <p><strong>Detection Method:</strong> Ensemble voting — an anomaly is confirmed when 2 of 3 AI detectors agree.</p>
+                <div style="margin-top:10px">
+                  <div class="sensor-row"><span class="sensor-label">Autoencoder</span><span class="sensor-value">Reconstruction error analysis</span></div>
+                  <div class="sensor-row"><span class="sensor-label">Isolation Forest</span><span class="sensor-value">Adaptive contamination scoring</span></div>
+                  <div class="sensor-row"><span class="sensor-label">LSTM Detector</span><span class="sensor-value">Sequence prediction error</span></div>
+                </div>
+                <p style="margin-top:10px">Sensors monitored: Temperature · Vibration · Motor Current · Speed · Load across all 5 machines every 2 seconds.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-anomaly -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: DEFECT DETECTION                                         -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-defect" class="view" style="display:none">
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🔍</span> Vision AI — Quality Inspection (M3)</div>
+              <span class="panel-badge info">YOLOv8 · SwinTransformer · MaskRCNN</span>
+            </div>
+            <div class="panel-body" style="padding:0">
+              <div class="defect-camera-view" id="defect-camera" style="height:240px;border-radius:0;margin:0">
+                <div style="color:rgba(255,255,255,0.4);font-size:12px">Awaiting inspection feed…</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">📊</span> Detection Statistics</div>
+            </div>
+            <div class="panel-body" id="defect-stats">
+              <div class="text-muted" style="font-size:12px">Waiting for first inspection…</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">📋</span> Detection Pipeline</div>
+          </div>
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+              <div style="text-align:center;padding:12px;background:var(--bg);border-radius:8px">
+                <div style="font-size:20px;margin-bottom:4px">🎯</div>
+                <div style="font-weight:700;font-size:13px;color:var(--primary)">Stage 1: YOLOv8</div>
+                <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">Real-time object detection · Bounding box localization · Multi-class defect classification</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--bg);border-radius:8px">
+                <div style="font-size:20px;margin-bottom:4px">🧠</div>
+                <div style="font-weight:700;font-size:13px;color:var(--primary)">Stage 2: Swin Transformer</div>
+                <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">Global context analysis · High-precision classification · Class probability distribution</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--bg);border-radius:8px">
+                <div style="font-size:20px;margin-bottom:4px">🔬</div>
+                <div style="font-weight:700;font-size:13px;color:var(--primary)">Stage 3: Mask R-CNN</div>
+                <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">Pixel-level segmentation · Defect area measurement · Severity assessment</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-defect -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: ROOT CAUSE ANALYSIS                                      -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-rca" class="view" style="display:none">
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🧬</span> Root Cause Analysis AI</div>
+            </div>
+            <div class="panel-body" id="rca-container">
+              <div class="text-muted" style="font-size:12px">Root cause analysis activates when machine faults are detected. Trigger a scenario to see analysis.</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">💡</span> Analysis Method</div>
+            </div>
+            <div class="panel-body">
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+                <div class="sensor-row"><span class="sensor-label">Data Sources</span><span class="sensor-value">Sensor history, machine logs, anomaly events</span></div>
+                <div class="sensor-row"><span class="sensor-label">Analysis</span><span class="sensor-value">Multi-factor causal chain tracing</span></div>
+                <div class="sensor-row"><span class="sensor-label">Output</span><span class="sensor-value">Ordered cause → effect graph</span></div>
+                <div class="sensor-row"><span class="sensor-label">Trigger</span><span class="sensor-value">Auto on critical / failure status</span></div>
+              </div>
+              <div style="margin-top:14px;font-size:11px;background:var(--bg);border-radius:6px;padding:10px;color:var(--text-secondary)">
+                <strong>Example Chain:</strong><br/>
+                Machine Failure → High Load → Increased Vibration → Bearing Wear → Temperature Rise
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-rca -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: SELF-HEALING                                             -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-healing" class="view" style="display:none">
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">♻️</span> Self-Healing Autonomous Control</div>
+            </div>
+            <div class="panel-body" style="padding:8px">
+              <div id="healing-list">
+                <div class="text-muted" style="padding:12px;font-size:12px">Monitoring — self-healing activates when anomalies exceed thresholds</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🤖</span> RL Control Strategies</div>
+            </div>
+            <div class="panel-body">
+              <div style="font-size:12px;line-height:1.7">
+                <div class="sensor-row"><span class="sensor-label">Algorithm</span><span class="sensor-value">PPO · SAC · DQN Ensemble</span></div>
+                <div class="sensor-row"><span class="sensor-label">State Space</span><span class="sensor-value">5 sensors × 5 machines = 25D</span></div>
+                <div class="sensor-row"><span class="sensor-label">Action Space</span><span class="sensor-value">Speed · Load · Cooling · Stop · Restart</span></div>
+                <div class="sensor-row"><span class="sensor-label">Reward</span><span class="sensor-value">Health improvement + production maintained</span></div>
+              </div>
+              <div style="margin-top:14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:6px">Available Actions</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <span class="panel-badge success">Reduce Speed</span>
+                <span class="panel-badge success">Reduce Load</span>
+                <span class="panel-badge info">Activate Cooling</span>
+                <span class="panel-badge info">Redistribute Tasks</span>
+                <span class="panel-badge warning">Temp Shutdown</span>
+                <span class="panel-badge danger">Emergency Stop</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-healing -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: PRODUCTION                                               -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-production" class="view" style="display:none">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">📈</span> Production Optimization AI</div>
+            <span class="panel-badge info">RL · GNN · Bayesian</span>
+          </div>
+          <div class="panel-body" id="optimization-container">
+            <div class="text-muted" style="font-size:12px">Optimization engine analyzing production flow…</div>
+          </div>
+        </div>
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">📊</span> Live Production Throughput</div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container" style="height:180px">
+                <canvas id="chart-production-2"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">⚡</span> Machine Utilization Balance</div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-container" style="height:180px">
+                <canvas id="chart-utilization-2"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-production -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: CYBERSECURITY                                            -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-cyber" class="view" style="display:none">
+        <div class="panel-grid panel-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🛡️</span> Cyber Threat Detection</div>
+              <span class="panel-badge success" id="cyber-badge">Secure</span>
+            </div>
+            <div class="panel-body" style="padding:8px">
+              <div id="cyber-threat-list">
+                <div style="padding:12px;font-size:12px;color:var(--text-muted)">Network monitoring active — no threats detected</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span class="panel-icon">🔒</span> Automated Cyber Defense Response</div>
+            </div>
+            <div class="panel-body" style="padding:8px">
+              <div id="cyber-response-list">
+                <div style="padding:12px;font-size:12px;color:var(--text-muted)">No automated responses yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">💻</span> Industrial IDS — PLC Command Monitor</div>
+          </div>
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:12px">
+              <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:20px">📡</div>
+                <div style="font-weight:700;color:var(--primary);margin:4px 0">Network Monitor</div>
+                <div style="color:var(--text-muted)">Packet pattern analysis · Isolation Forest · Autoencoder</div>
+              </div>
+              <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:20px">🔌</div>
+                <div style="font-weight:700;color:var(--primary);margin:4px 0">PLC Inspector</div>
+                <div style="color:var(--text-muted)">Command validation · Protocol compliance · Injection detection</div>
+              </div>
+              <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:20px">⚡</div>
+                <div style="font-weight:700;color:var(--primary);margin:4px 0">Auto Response</div>
+                <div style="color:var(--text-muted)">IP blocking · Machine isolation · Alert cascade</div>
+              </div>
+              <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:20px">🎯</div>
+                <div style="font-weight:700;color:var(--primary);margin:4px 0">Simulation Engine</div>
+                <div style="color:var(--text-muted)">Attack scenarios for training and testing</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-cyber -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: LIFECYCLE                                                -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-lifecycle" class="view" style="display:none">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">📋</span> Machine Lifecycle Monitoring</div>
+          </div>
+          <div class="panel-body" style="padding:0;overflow-x:auto">
+            <table class="lifecycle-table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Machine Name</th><th>Runtime</th>
+                  <th>Health Score</th><th>Remaining Life</th>
+                  <th>Last Maintenance</th><th>Next Due</th><th>Failures</th>
+                </tr>
+              </thead>
+              <tbody id="lifecycle-tbody">
+                <tr><td colspan="8" style="padding:16px;color:var(--text-muted);font-size:12px">Loading lifecycle data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /view-lifecycle -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: INCIDENT TIMELINE                                        -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-timeline" class="view" style="display:none">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">🕐</span> AI Incident Timeline — Chronological Event Log</div>
+            <button class="btn btn-outline" onclick="fetch(API_BASE+'/api/incidents/clear',{method:'DELETE'}).then(()=>{APP.incidents=[];renderTimeline();})">Clear</button>
+          </div>
+          <div class="panel-body" style="padding:8px">
+            <div class="timeline" id="timeline-full" style="max-height:600px;overflow-y:auto">
+              <div class="text-muted" style="padding:12px;font-size:12px">Loading timeline…</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-timeline -->
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: SCENARIOS                                                -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <div id="view-scenarios" class="view" style="display:none">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">🎭</span> Scenario Simulation Engine</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-outline" id="stop-all-scenarios">⛔ Stop All</button>
+              <button class="btn btn-danger" id="reset-factory-btn">🔄 Reset Factory</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Active Scenarios: <span id="active-scenarios"><span style="color:var(--text-muted)">None</span></span></div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px">Machine Fault Scenarios</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+              <button class="scenario-btn" data-scenario="high_vibration" data-machine="M1">〰 High Vibration — M1</button>
+              <button class="scenario-btn" data-scenario="overheating" data-machine="M2">🔥 Overheating — M2</button>
+              <button class="scenario-btn" data-scenario="machine_breakdown" data-machine="M3">❌ Machine Breakdown — M3</button>
+              <button class="scenario-btn" data-scenario="production_bottleneck" data-machine="M4">⚠ Bottleneck — M4</button>
+              <button class="scenario-btn" data-scenario="bearing_wear" data-machine="M5">⚙ Bearing Wear — M5</button>
+              <button class="scenario-btn" data-scenario="overheating" data-machine="M1">🔥 Overheating — M1</button>
+              <button class="scenario-btn" data-scenario="high_vibration" data-machine="M4">〰 High Vibration — M4</button>
+              <button class="scenario-btn" data-scenario="machine_breakdown" data-machine="M5">❌ Breakdown — M5</button>
+            </div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px">Cybersecurity Attack Scenarios</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+              <button class="scenario-btn cyber" data-scenario="cyber_attack" data-machine="M1">🛡 Command Injection — M1</button>
+              <button class="scenario-btn cyber" data-scenario="cyber_attack" data-machine="M2">🛡 PLC Override — M2</button>
+              <button class="scenario-btn cyber" data-scenario="cyber_attack">🛡 Network Flooding</button>
+              <button class="scenario-btn cyber" data-scenario="cyber_attack" data-machine="M3">🛡 Unauthorized Control — M3</button>
+            </div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px">Quality & Production</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <button class="scenario-btn" data-scenario="defective_product">🔍 Defective Product Batch</button>
+              <button class="scenario-btn" data-scenario="production_bottleneck">📉 Production Bottleneck</button>
+              <button class="scenario-btn" data-scenario="power_surge" data-machine="M4">⚡ Power Surge — M4</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon">ℹ️</span> How Scenarios Work</div>
+          </div>
+          <div class="panel-body" style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+            <p>When a scenario is triggered, sensor values change dynamically. The AI modules detect the changes and respond:</p>
+            <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="background:var(--bg);border-radius:6px;padding:8px">
+                <strong>1. Sensor Injection</strong><br/>Fault multipliers applied to machine sensors
+              </div>
+              <div style="background:var(--bg);border-radius:6px;padding:8px">
+                <strong>2. Anomaly Detection</strong><br/>3-detector ensemble confirms deviation
+              </div>
+              <div style="background:var(--bg);border-radius:6px;padding:8px">
+                <strong>3. Predictive Alert</strong><br/>TCN/LSTM/TFT raise failure probability
+              </div>
+              <div style="background:var(--bg);border-radius:6px;padding:8px">
+                <strong>4. Self-Healing</strong><br/>RL controller applies corrective actions
+              </div>
+              <div style="background:var(--bg);border-radius:6px;padding:8px">
+                <strong>5. 3D Twin Update</strong><br/>Machine shakes, sparks, warning lights activate
+              </div>
+              <div style="background:var(--bg);border-radius:6px;padding:8px">
+                <strong>6. Auto Resolution</strong><br/>Self-healing restores normal state in ~30s
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /view-scenarios -->
+
+    </main>
+  </div>
+</div>
+
+<script src="js/websocket_client.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/digital_twin_3d.js"></script>
+<script src="js/app.js"></script>
+<script>
+// Additional view sync for secondary lists
+const _origRenderAlerts = renderAlerts;
+renderAlerts = function() {
+  _origRenderAlerts();
+  // Sync full alerts view
+  const fullList = document.getElementById('alert-list-full');
+  const mainList = document.getElementById('alert-list');
+  if (fullList && mainList) fullList.innerHTML = mainList.innerHTML;
+  const b2 = document.getElementById('alert-count-badge-2');
+  if (b2) { const b1 = document.getElementById('alert-count-badge'); if(b1) b2.textContent = b1.textContent; }
+};
+const _origRenderTimeline = renderTimeline;
+renderTimeline = function() {
+  _origRenderTimeline();
+  const fullTimeline = document.getElementById('timeline-full');
+  const mainTimeline = document.getElementById('timeline-list');
+  if (fullTimeline && mainTimeline) fullTimeline.innerHTML = mainTimeline.innerHTML;
+  const fullTimeline2 = document.getElementById('timeline-list-full');
+  if (fullTimeline2 && mainTimeline) fullTimeline2.innerHTML = mainTimeline.innerHTML;
+};
+const _origRenderLifecycle = renderLifecycle;
+renderLifecycle = function() {
+  _origRenderLifecycle();
+};
+// Production view charts use same canvases — init extra ones
+setTimeout(() => {
+  if (APP.charts) {
+    APP.charts.initProductionChart('chart-production-2');
+    APP.charts.initBarChart('chart-utilization-2', ['M1','M2','M3','M4','M5']);
+  }
+}, 200);
+// Keep secondary chart canvases in sync
+const _origPushData = ChartManager.prototype.pushData;
+</script>
+</body>
+</html>
