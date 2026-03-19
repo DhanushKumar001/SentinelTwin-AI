@@ -127,7 +127,7 @@ Visualization: Charts / 3D environment
 
 
 # Clone repository
-git clone https://github.com/your-username/sentineltwin-ai.git
+git clone "URL"
 
 # Navigate to project
 cd sentineltwin-ai
