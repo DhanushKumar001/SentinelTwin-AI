@@ -1,11 +1,11 @@
-🚀 SentinelTwin AI
-🧠 Overview
+SentinelTwin AI
+Overview
 
 SentinelTwin AI is an advanced digital twin platform that simulates industrial systems in real time, enabling intelligent monitoring, anomaly detection, and autonomous response to cyber threats and machine failures.
 
 It combines AI-driven data regulation, scenario-based simulation, and real-time system control to create a smart, self-healing industrial environment.
 
-⚠️ Problem Statement
+Problem Statement
 
 Modern industries face:
 
@@ -17,21 +17,21 @@ Delayed response to failures and anomalies
 
 No unified system for simulation + control + prediction
 
-💡 Solution
+Solution
 
 SentinelTwin AI provides:
 
-🔄 Real-time Digital Twin Simulation
+Real-time Digital Twin Simulation
 
-🤖 AI-based data monitoring & regulation
+AI-based data monitoring & regulation
 
-🚨 Anomaly detection for system failures
+Anomaly detection for system failures
 
-🔐 Cyberattack simulation & protection
+Cyberattack simulation & protection
 
-⚙️ Autonomous response system
+Autonomous response system
 
-🏗️ System Architecture
+System Architecture
 
 Frontend Dashboard → Visual monitoring & control
 
@@ -43,14 +43,14 @@ Simulation Engine → Scenario-based data generation
 
 Digital Twin Layer → Virtual representation of machines
 
-🔍 Key Features
-🟢 Digital Twin
+Key Features
+Digital Twin
 
 Real-time virtual representation of industrial systems
 
 3D/visual environment for monitoring
 
-📊 Sensor Data Simulation
+Sensor Data Simulation
 
 Simulates:
 
@@ -62,7 +62,7 @@ Vibration
 
 Machine status
 
-🤖 AI Data Regulation
+AI Data Regulation
 
 Monitors incoming data
 
@@ -70,7 +70,7 @@ Detects abnormal patterns
 
 Adjusts system behavior automatically
 
-🔐 Cybersecurity Module
+Cybersecurity Module
 
 Detects:
 
@@ -84,7 +84,7 @@ PLC attacks
 
 Network flooding
 
-🛡️ Auto Response System
+Auto Response System
 
 Blocks malicious IPs
 
@@ -92,19 +92,19 @@ Isolates affected machines
 
 Stabilizes system automatically
 
-🎮 Scenario-Based Simulation
+Scenario-Based Simulation
 
 Users can trigger scenarios manually:
 
-⚠️ Machine Failure
+Machine Failure
 
-🔥 Overheating
+Overheating
 
-🌐 Network Attack
+Network Attack
 
-⚡ System Overload
+System Overload
 
-👉 All changes reflect in:
+All changes reflect in:
 
 Dashboard
 
@@ -112,7 +112,7 @@ AI model decisions
 
 Digital twin behavior
 
-🧪 Tech Stack
+Tech Stack
 
 Frontend: (React / Dashboard UI)
 
